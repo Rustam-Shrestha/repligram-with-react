@@ -13,9 +13,13 @@ const customMiddleware = (req, res, next) => {
     next(); // Call next to pass control to the next middleware or route handler
 };
 
-// Use custom middleware
-app.use(customMiddleware);
+// // Use custom middleware
+// app.use(customMiddleware);
 
+// instead of doing aboce code we could pass it to a get endpoint like this 
+app.get("/middle",customMiddleware, (req, res) => {
+    res.send("middleware to a function check console");
+});
 // Define route handler for the root URL
 app.get("/", (req, res) => {
     res.send("Hello World");
