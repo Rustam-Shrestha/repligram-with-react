@@ -1,25 +1,43 @@
 // Require express
+// imporrt part
 const express = require("express");
 const app = express();
 const PORT = 5000;
+// using mongoose middleware in sql we already had all of them
+//use npm i mongoose to get this middleware
+const mongoose = require("mongoose");
+// we get uri from mongodb cloud atlas when we input username and password and
+//when we create a database
+const {MONGOURI} = require("./valuekeys.js");
 
-// Define custom middleware
-const customMiddleware = (req, res, next) => {
-    var a = 10;
-    var b = 20;
-    var c = a * b;
-    console.log("Product is " + c);
-    //if not used next() website will just load infinitely
-    next(); // Call next to pass control to the next middleware or route handler
-};
 
-// // Use custom middleware
-// app.use(customMiddleware);
+// connection part --=========================================================
+// it is just like mysqli_connect in php with url that we used to do with jdbc
+mongoose.connect(MONGOURI, {useNewUrlParser:true, useUnifiedTopology: true });
+// when connection function returns connected then log the console with the message
 
-// instead of doing aboce code we could pass it to a get endpoint like this 
-app.get("/middle",customMiddleware, (req, res) => {
-    res.send("middleware to a function check console");
+mongoose.connection.on("connected",()=>{
+    console.log("we are connected to the mongodb database")
 });
+
+// same as die("error") in php
+mongoose.connection.on("error",()=>{
+    console.log("unsuccessful connecting to the mongodb database")
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Define route handler for the root URL
 app.get("/", (req, res) => {
     res.send("Hello World");
