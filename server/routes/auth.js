@@ -2,39 +2,48 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose")
 const User = mongoose.model("User")
+// npm i bcryptjs
+const bcrypt = require("bcryptjs")
 
-router.post("/signup",(req,res)=>{
-    const {name, email, password} = req.body;
-    if(!name || !email || !password){
-        return res.status(422).json({error:"Please provide all the information"});
+router.post("/signup", (req, res) => {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+        return res.status(422).json({ error: "Please provide all the information" });
     }
-    
-    User.findOne({email: email})
-        .then(savedUser => {
-            if(savedUser){
-                return res.status(422).json({error:"User already exists with that email"});
-            } else {
-                const newUser = new User({
-                    email, password, name
-                });
 
-                newUser.save()
-                    .then(user => {
-                        res.json({message:"User registered successfully"});
-                    })
-                    .catch(err => {
-                        console.error("Error saving user:", err);
-                        res.status(500).json({error: "Failed to register user"});
+    // select from database email matchings
+    User.findOne({ email: email })
+        .then(savedUser => {
+            if (savedUser) {
+                return res.status(422).json({ error: "User already exists with that email" });
+            } else {
+                // hashing with salt value 
+                bcrypt.hash(password, 10).then(hashedPassword => {
+                    // pass the hashed password in the password section others will get req.body.<key names>
+                    const newUser = new User({
+                        email, password:hashedPassword, name
                     });
+                    // insertion
+                    newUser.save()
+                        .then(user => {
+                            res.json({ message: "User registered successfully" });
+                        })
+                        .catch(err => {
+                            console.error("Error saving user:", err);
+                            res.status(500).json({ error: "Failed to register user" });
+                        });
+                })
+
+
             }
         })
         .catch(err => {
             console.error("Error finding user:", err);
-            res.status(500).json({error: "Failed to register user"});
+            res.status(500).json({ error: "Failed to register user" });
         });
 });
-  
-router.get("/", (req,res) => {
+
+router.get("/", (req, res) => {
     res.send("User authentication site");
 });
 
