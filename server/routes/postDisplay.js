@@ -4,6 +4,31 @@ const mongoose = require("mongoose");
 const loginChecker = require("../middleware/loginChecker")
 const Post = mongoose.model("Post")
 
+
+router.get("/allpost",(req,res)=>{
+    // fetch post database and also fetch id and name of post owner
+    Post.find().populate("postedBy", "_id name").then(posts=>{
+        res.status(200).json(posts);
+    }).catch(err=>{
+        res.status(422).json(err)
+    })
+
+})
+router.get("/myposts",loginChecker,(req,res)=>{
+    console.log("User:", req.user);
+    Post.find({ postedBy: req.user._id })
+        .populate("postedBy", "_id name")
+        .then(myposts => {
+            console.log("My Posts:", myposts);
+            res.status(200).json(myposts);
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            res.status(422).json(err);
+        });
+
+})
+
 router.post("/createpost",loginChecker,(req,res)=>{
     const{title, body} = req.body;
     if(!title || !body){
