@@ -7,7 +7,8 @@ const userSchema  = new mongoose.Schema({
     },
     email:{
         type:String,
-        required: true
+        required: true,
+        unique: true
     },
     password:{
         type:String,
@@ -17,3 +18,11 @@ const userSchema  = new mongoose.Schema({
 
 //importing that schema with the name User
 module.exports = mongoose.model("User", userSchema);
+
+
+
+
+
+
+
+
