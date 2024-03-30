@@ -5,7 +5,7 @@ const User = mongoose.model("User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET} = require("../valuekeys")
-
+const loginChecker = require("../middleware/loginChecker")
 
 // Define your secret pepper value
 const pepper = "bazinga";
@@ -64,6 +64,13 @@ router.get("/", (req, res) => {
 module.exports = router;
 
 
+//creating an endpoint that will get hit before asking data to server(safety mechanism)
+router.get("/checkit", loginChecker,  (req, res) => {
+    res.send("wait we are checking");
+})
+
+
+
 router.post("/signin", (req, res) => {
     // Taking user-given email and password by destructuring
     const { email, password } = req.body;
@@ -84,7 +91,7 @@ router.post("/signin", (req, res) => {
                     if (!matched) {
                         return res.status(422).json({ error: "Invalid password" });
                     }
-                    const token = jwt.sign({id:savedUser._id}, JWT_SECRET)
+                    const token = jwt.sign({_id:savedUser._id}, JWT_SECRET)
 
                     res.json({token});
                 })
