@@ -20,8 +20,9 @@ module.exports = (req, res, next) => {
         const { _id } = payload;
         User.findById(_id).then(userdata=>{
             req.user = userdata
+            // next will pass in the control to next functions
+            next();
         });
-        next();
     });
 }
 }
