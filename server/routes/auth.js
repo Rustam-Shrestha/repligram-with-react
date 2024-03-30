@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const {JWT_SECRET} = require("../valuekeys")
 
 
 // Define your secret pepper value
@@ -82,7 +84,9 @@ router.post("/signin", (req, res) => {
                     if (!matched) {
                         return res.status(422).json({ error: "Invalid password" });
                     }
-                    res.status(200).json({ message: "Signed in" });
+                    const token = jwt.sign({id:savedUser._id}, JWT_SECRET)
+
+                    res.json({token});
                 })
                 .catch(err => {
                     console.error("Error comparing passwords:", err);
